@@ -1,6 +1,7 @@
 import torch
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset
+import torchaudio
 
 from tqdm import tqdm
 
@@ -88,11 +89,25 @@ class Dataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
+        new_idx = idx
+
         raw_data = torch.tensor(
-            np.load(os.path.join(self.data_dir, "nema_npy", self.ema_files[idx])),
+            np.load(os.path.join(self.data_dir, "nema_npy", self.ema_files[new_idx])),
             dtype=torch.float32,
         )
 
+        # decimation + normalization across feature dim
+        raw_data = torchaudio.functional.resample(
+            torch.transpose(raw_data, 0, 1), 200, 50
+        )
+        raw_data = torch.transpose(raw_data, 0, 1)
+
+        # norm = torch.unsqueeze(torch.norm(raw_data, dim=-1), -1)
+        # norm = norm.repeat(1, 12)
+
+        # raw_data = raw_data / norm
+
+        # pad
         final_data = torch.zeros((self.max_ema_len, raw_data.shape[-1]))
 
         final_data[: raw_data.shape[0], :] = raw_data

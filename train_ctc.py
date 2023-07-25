@@ -15,13 +15,13 @@ from utils.ctc_utils import compute_error_rates
 
 
 # config + hyperparams
-DATA_DIR = "./data/cin_us_mngu0/"
-DATASET = "cin_us_mngu0"
-MODEL_NAME = "cnn_gru_larger_w_dropoutss"
+DATA_DIR = "./data/cin_us_fjmw0/"
+DATASET = "cin_us_fjmw0"
+MODEL_NAME = "cnn_gru_larger_w_dropouts"
 
 PAUSE_TOKEN = "pau"
-MAX_EMA_LEN = 3400
-DECIMATION_FACTOR = 8
+DECIMATION_FACTOR = 2
+MAX_EMA_LEN = int(1340 / DECIMATION_FACTOR)
 
 device = torch.device("cuda:1")
 
@@ -34,12 +34,12 @@ num_steps = 5
 
 # model config
 in_feature_dim = 12
-conv_kernel = 6
-conv_stride = 6
+conv_kernel = 2
+conv_stride = 2
 hidden_dim = 256
-num_layers = 3
+num_layers = 2
 vocab_size = 43
-dropout = 0.2
+dropout = 0.6
 
 
 # wandb initialization
@@ -70,7 +70,7 @@ decoder = decoder.to(device)
 
 
 # dataloader initialization
-torch.manual_seed(0)
+# torch.manual_seed(0)
 
 dataset = Dataset(DATA_DIR, PAUSE_TOKEN, MAX_EMA_LEN, DECIMATION_FACTOR)
 
